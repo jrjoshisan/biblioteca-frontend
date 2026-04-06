@@ -117,9 +117,9 @@ async function eliminarLibro(id) {
 }
 
 async function buscarLibro() {
-    const titulo = document.getElementById('buscar-libro').value;
-    if (titulo.length < 2) { cargarLibros(); return; }
-    const res = await fetch(`${API}/libros/buscar?titulo=${titulo}`);
+    const q = document.getElementById('buscar-libro').value;
+    if (q.length < 2) { cargarLibros(); return; }
+    const res = await fetch(`${API}/libros/buscar?q=${encodeURIComponent(q)}`);
     const libros = await res.json();
     const tbody = document.getElementById('tabla-libros');
     tbody.innerHTML = '';
@@ -130,7 +130,7 @@ async function buscarLibro() {
                 <td>${l.autor}</td>
                 <td>${l.categoria}</td>
                 <td>${l.anio_publicacion || '-'}</td>
-                <td>-</td>
+                <td>${l.unidades || '-'}</td>
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="editarLibro(${l.id_libro})">
                         <i class="bi bi-pencil"></i>
