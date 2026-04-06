@@ -1,0 +1,25 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.table th {
+    font-size: 0.9rem;
+}
+
+.table td {
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+.btn-sm {
+    margin: 0 2px;
+}
+
+.modal-header {
+    border-radius: 0;
+}
