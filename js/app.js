@@ -1,5 +1,64 @@
 const API = 'https://biblioteca-api-production-3058.up.railway.app';
 
+// ==================== AUTH ====================
+function getToken() {
+    return localStorage.getItem('token');
+}
+
+function headers() {
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+    };
+}
+
+function verificarLogin() {
+    const token = getToken();
+    if (token) {
+        document.getElementById('nav-login').style.display = 'none';
+        document.getElementById('nav-logout').style.display = 'block';
+    } else {
+        document.getElementById('nav-login').style.display = 'block';
+        document.getElementById('nav-logout').style.display = 'none';
+        abrirModalLogin();
+    }
+}
+
+function abrirModalLogin() {
+    document.getElementById('login-usuario').value = '';
+    document.getElementById('login-password').value = '';
+    document.getElementById('login-error').classList.add('d-none');
+    new bootstrap.Modal(document.getElementById('modalLogin')).show();
+}
+
+async function hacerLogin() {
+    const usuario = document.getElementById('login-usuario').value;
+    const password = document.getElementById('login-password').value;
+    const errorDiv = document.getElementById('login-error');
+
+    const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario, password })
+    });
+
+    if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('token', data.token);
+        bootstrap.Modal.getInstance(document.getElementById('modalLogin')).hide();
+        verificarLogin();
+        cargarLibros();
+    } else {
+        errorDiv.textContent = 'Usuario o contraseña incorrectos';
+        errorDiv.classList.remove('d-none');
+    }
+}
+
+function cerrarSesion() {
+    localStorage.removeItem('token');
+    verificarLogin();
+}
+
 // ==================== NAVEGACION ====================
 function mostrarSeccion(seccion) {
     document.getElementById('seccion-libros').style.display = 'none';
@@ -97,7 +156,7 @@ async function guardarLibro() {
 
     const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers(),
         body: JSON.stringify(datos)
     });
 
@@ -112,7 +171,7 @@ async function guardarLibro() {
 
 async function eliminarLibro(id) {
     if (!confirm('¿Estás seguro de eliminar este libro?')) return;
-    await fetch(`${API}/libros/${id}`, { method: 'DELETE' });
+    await fetch(`${API}/libros/${id}`, { method: 'DELETE', headers: headers() });
     cargarLibros();
 }
 
@@ -145,7 +204,7 @@ async function buscarLibro() {
 
 // ==================== USUARIOS ====================
 async function cargarUsuarios() {
-    const res = await fetch(`${API}/usuarios`);
+    const res = await fetch(`${API}/usuarios`, { headers: headers() });
     const usuarios = await res.json();
     const tbody = document.getElementById('tabla-usuarios');
     tbody.innerHTML = '';
@@ -183,7 +242,7 @@ function abrirModalUsuario() {
 }
 
 async function editarUsuario(id) {
-    const res = await fetch(`${API}/usuarios/${id}`);
+    const res = await fetch(`${API}/usuarios/${id}`, { headers: headers() });
     const u = await res.json();
     document.getElementById('usuario-id').value = u.id_usuario;
     document.getElementById('usuario-nombre').value = u.nombre;
@@ -213,7 +272,7 @@ async function guardarUsuario() {
 
     const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers(),
         body: JSON.stringify(datos)
     });
 
@@ -228,13 +287,13 @@ async function guardarUsuario() {
 
 async function eliminarUsuario(id) {
     if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
-    await fetch(`${API}/usuarios/${id}`, { method: 'DELETE' });
+    await fetch(`${API}/usuarios/${id}`, { method: 'DELETE', headers: headers() });
     cargarUsuarios();
 }
 
 // ==================== PRESTAMOS ====================
 async function cargarPrestamos() {
-    const res = await fetch(`${API}/prestamos`);
+    const res = await fetch(`${API}/prestamos`, { headers: headers() });
     const prestamos = await res.json();
     const tbody = document.getElementById('tabla-prestamos');
     tbody.innerHTML = '';
@@ -263,7 +322,7 @@ async function cargarPrestamos() {
 
 async function abrirModalPrestamo() {
     const [resUsuarios, resLibros] = await Promise.all([
-        fetch(`${API}/usuarios`),
+        fetch(`${API}/usuarios`, { headers: headers() }),
         fetch(`${API}/libros`)
     ]);
     const usuarios = await resUsuarios.json();
@@ -296,7 +355,7 @@ async function guardarPrestamo() {
 
     const res = await fetch(`${API}/prestamos`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers(),
         body: JSON.stringify(datos)
     });
 
@@ -311,9 +370,10 @@ async function guardarPrestamo() {
 
 async function devolverLibro(id) {
     if (!confirm('¿Confirmar devolución?')) return;
-    await fetch(`${API}/prestamos/${id}/devolver`, { method: 'PUT' });
+    await fetch(`${API}/prestamos/${id}/devolver`, { method: 'PUT', headers: headers() });
     cargarPrestamos();
 }
 
 // ==================== INICIO ====================
+verificarLogin();
 cargarLibros();
