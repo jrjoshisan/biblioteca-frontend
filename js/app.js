@@ -34,6 +34,18 @@ function abrirModalLogin() {
     new bootstrap.Modal(document.getElementById('modalLogin')).show();
 }
 
+function togglePassword() {
+    const input = document.getElementById('login-password');
+    const icon = document.getElementById('icon-password');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+
 async function hacerLogin() {
     const usuario = document.getElementById('login-usuario').value;
     const password = document.getElementById('login-password').value;

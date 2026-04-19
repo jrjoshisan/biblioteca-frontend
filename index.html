@@ -212,7 +212,12 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Contraseña</label>
-                        <input type="password" id="login-password" class="form-control">
+                        <div class="input-group">
+                            <input type="password" id="login-password" class="form-control">
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+                                <i class="bi bi-eye" id="icon-password"></i>
+                            </button>
+                        </div>
                     </div>
                     <button class="btn btn-primary w-100" onclick="hacerLogin()">
                         <i class="bi bi-box-arrow-in-right"></i> Ingresar
