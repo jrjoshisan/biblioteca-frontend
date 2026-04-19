@@ -1,4 +1,88 @@
+/* ==================== BASE ==================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    font-family: 'Inter', sans-serif;
+}
+
 body {
+    background-color: #f0f2f5;
+}
+
+/* ==================== NAVBAR ==================== */
+.navbar {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+    padding: 0.8rem 1rem;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.navbar-brand {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: #ffffff !important;
+}
+
+.navbar-brand i {
+    color: #4cc9f0;
+    margin-right: 6px;
+}
+
+.nav-link {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.75) !important;
+    padding: 0.4rem 0.9rem !important;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+}
+
+.nav-link:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link.active {
+    color: #ffffff !important;
+    background-color: rgba(76, 201, 240, 0.15);
+}
+
+.nav-link i {
+    margin-right: 4px;
+}
+
+.nav-link.text-warning {
+    color: #f8961e !important;
+}
+
+.nav-link.text-warning:hover {
+    background-color: rgba(248, 150, 30, 0.15);
+}
+
+/* ==================== TABLAS ==================== */
+.table th {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.table td {
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+.btn-sm {
+    margin: 0 2px;
+}
+
+/* ==================== MODALES ==================== */
+.modal-header {
+    border-radius: 0;
+}
+/*body {
     background-color: #f8f9fa;
 }
 
@@ -22,4 +106,4 @@ body {
 
 .modal-header {
     border-radius: 0;
-}
+}*/
