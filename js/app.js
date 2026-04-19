@@ -205,7 +205,7 @@ function filaLibro(l) {
         : `<i class="bi bi-circle text-muted" style="font-size:1.1rem"></i>`;
 
     return `<tr class="${l.leido ? 'fila-leida' : ''}" style="cursor:pointer" onclick="verDetalleLibro(${l.id_libro})">
-        <td>${l.titulo}</td>
+        <td>${l.titulo}${l.leido ? '<span class="badge-leido">Leído</span>' : ''}</td>
         <td>${l.autor}</td>
         <td>${getBadgeCategoria(l.categoria)}</td>
         <td>${leidoIcon}</td>

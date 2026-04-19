@@ -451,12 +451,19 @@ body {
 
 /* ==================== LEIDO ==================== */
 .fila-leida td {
-    opacity: 0.6;
+    opacity: 0.75;
 }
 
-.fila-leida td:first-child {
-    text-decoration: line-through;
-    color: #888;
+.badge-leido {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    background: #d1e7dd;
+    color: #0a3622;
+    margin-left: 0.4rem;
+    vertical-align: middle;
 }
 
 /* ==================== RESPONSIVE MOVIL ==================== */
