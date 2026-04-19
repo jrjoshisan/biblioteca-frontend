@@ -276,3 +276,88 @@ body {
     background: #fde8ea;
     color: #a82030;
 }
+
+/* ==================== DASHBOARD ==================== */
+.stat-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-top: 4px solid transparent;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-numero {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-libros {
+    border-top-color: #4cc9f0;
+}
+
+.stat-libros .stat-icon {
+    color: #4cc9f0;
+}
+
+.stat-libros .stat-numero {
+    color: #0f3460;
+}
+
+.stat-usuarios {
+    border-top-color: #2a8a2a;
+}
+
+.stat-usuarios .stat-icon {
+    color: #2a8a2a;
+}
+
+.stat-usuarios .stat-numero {
+    color: #2a8a2a;
+}
+
+.stat-prestamos-activos {
+    border-top-color: #f8961e;
+}
+
+.stat-prestamos-activos .stat-icon {
+    color: #f8961e;
+}
+
+.stat-prestamos-activos .stat-numero {
+    color: #f8961e;
+}
+
+.stat-prestamos-total {
+    border-top-color: #6b2fa8;
+}
+
+.stat-prestamos-total .stat-icon {
+    color: #6b2fa8;
+}
+
+.stat-prestamos-total .stat-numero {
+    color: #6b2fa8;
+}

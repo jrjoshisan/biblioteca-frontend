@@ -17,6 +17,7 @@ function verificarLogin() {
     if (token) {
         document.getElementById('nav-login').style.display = 'none';
         document.getElementById('nav-logout').style.display = 'block';
+        mostrarSeccion('dashboard');
     } else {
         document.getElementById('nav-login').style.display = 'block';
         document.getElementById('nav-logout').style.display = 'none';
@@ -47,7 +48,6 @@ async function hacerLogin() {
         localStorage.setItem('token', data.token);
         bootstrap.Modal.getInstance(document.getElementById('modalLogin')).hide();
         verificarLogin();
-        cargarLibros();
     } else {
         errorDiv.textContent = 'Usuario o contraseña incorrectos';
         errorDiv.classList.remove('d-none');
@@ -89,14 +89,30 @@ function getBadgeCategoria(categoria) {
 
 // ==================== NAVEGACION ====================
 function mostrarSeccion(seccion) {
+    document.getElementById('seccion-dashboard').style.display = 'none';
     document.getElementById('seccion-libros').style.display = 'none';
     document.getElementById('seccion-usuarios').style.display = 'none';
     document.getElementById('seccion-prestamos').style.display = 'none';
     document.getElementById('seccion-' + seccion).style.display = 'block';
 
+    if (seccion === 'dashboard') cargarEstadisticas();
     if (seccion === 'libros') cargarLibros();
     if (seccion === 'usuarios') cargarUsuarios();
     if (seccion === 'prestamos') cargarPrestamos();
+}
+
+// ==================== DASHBOARD ====================
+async function cargarEstadisticas() {
+    try {
+        const res = await fetch(`${API}/estadisticas`, { headers: headers() });
+        const data = await res.json();
+        document.getElementById('stat-total-libros').textContent = data.total_libros;
+        document.getElementById('stat-total-usuarios').textContent = data.total_usuarios;
+        document.getElementById('stat-prestamos-activos').textContent = data.prestamos_activos;
+        document.getElementById('stat-prestamos-total').textContent = data.prestamos_total;
+    } catch (err) {
+        console.error('Error cargando estadísticas:', err);
+    }
 }
 
 // ==================== LIBROS ====================
@@ -404,4 +420,3 @@ async function devolverLibro(id) {
 
 // ==================== INICIO ====================
 verificarLogin();
-cargarLibros();

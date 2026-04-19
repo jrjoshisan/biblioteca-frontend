@@ -15,7 +15,7 @@
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="#" onclick="mostrarSeccion('dashboard')">
                 <i class="bi bi-book-half"></i> Biblioteca Personal
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -24,7 +24,12 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#" onclick="mostrarSeccion('libros')">
+                        <a class="nav-link" href="#" onclick="mostrarSeccion('dashboard')">
+                            <i class="bi bi-grid"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="mostrarSeccion('libros')">
                             <i class="bi bi-book"></i> Libros
                         </a>
                     </li>
@@ -56,8 +61,46 @@
     <!-- CONTENIDO PRINCIPAL -->
     <div class="container mt-4">
 
+        <!-- SECCION DASHBOARD -->
+        <div id="seccion-dashboard" style="display:none">
+            <div class="mb-4">
+                <h2><i class="bi bi-grid"></i> Inicio</h2>
+                <p class="text-muted">Resumen general de tu biblioteca</p>
+            </div>
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card stat-libros" onclick="mostrarSeccion('libros')">
+                        <div class="stat-icon"><i class="bi bi-book"></i></div>
+                        <div class="stat-numero" id="stat-total-libros">-</div>
+                        <div class="stat-label">Libros</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-usuarios" onclick="mostrarSeccion('usuarios')">
+                        <div class="stat-icon"><i class="bi bi-people"></i></div>
+                        <div class="stat-numero" id="stat-total-usuarios">-</div>
+                        <div class="stat-label">Usuarios activos</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-prestamos-activos" onclick="mostrarSeccion('prestamos')">
+                        <div class="stat-icon"><i class="bi bi-arrow-left-right"></i></div>
+                        <div class="stat-numero" id="stat-prestamos-activos">-</div>
+                        <div class="stat-label">Préstamos activos</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-prestamos-total" onclick="mostrarSeccion('prestamos')">
+                        <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
+                        <div class="stat-numero" id="stat-prestamos-total">-</div>
+                        <div class="stat-label">Total préstamos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- SECCION LIBROS -->
-        <div id="seccion-libros">
+        <div id="seccion-libros" style="display:none">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2><i class="bi bi-book"></i> Libros</h2>
                 <button class="btn btn-primary" onclick="abrirModalLibro()">
