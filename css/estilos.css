@@ -82,28 +82,87 @@ body {
 .modal-header {
     border-radius: 0;
 }
-/*body {
-    background-color: #f8f9fa;
-}
 
-.navbar-brand {
+/* ==================== CONTENIDO PRINCIPAL ==================== */
+.container.mt-4 h2 {
     font-size: 1.4rem;
-    font-weight: bold;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 1rem;
 }
 
-.table th {
+.container.mt-4 h2 i {
+    color: #4cc9f0;
+}
+
+/* ==================== TABLA ==================== */
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.table {
+    margin-bottom: 0;
+    background-color: #ffffff;
+}
+
+.table thead.table-dark th {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+    border: none;
+    padding: 0.9rem 1rem;
+}
+
+.table tbody tr {
+    transition: background-color 0.15s ease;
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.table tbody tr:hover {
+    background-color: #f0f7ff;
+}
+
+.table tbody td {
+    padding: 0.8rem 1rem;
+    border: none;
+}
+
+/* ==================== BOTONES ==================== */
+.btn-primary {
+    background: linear-gradient(135deg, #0f3460, #4cc9f0);
+    border: none;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.5rem 1.1rem;
+    transition: opacity 0.2s ease;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+    background: linear-gradient(135deg, #0f3460, #4cc9f0);
+    border: none;
+}
+
+.btn-warning {
+    border-radius: 6px;
+}
+
+.btn-danger {
+    border-radius: 6px;
+}
+
+/* ==================== BUSCADOR ==================== */
+#buscar-libro {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    padding: 0.6rem 1rem;
     font-size: 0.9rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.table td {
-    vertical-align: middle;
-    font-size: 0.9rem;
+#buscar-libro:focus {
+    border-color: #4cc9f0;
+    box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.15);
+    outline: none;
 }
-
-.btn-sm {
-    margin: 0 2px;
-}
-
-.modal-header {
-    border-radius: 0;
-}*/
