@@ -87,7 +87,6 @@ function getBadgeCategoria(categoria) {
     return `<span class="badge-categoria ${clase}">${categoria}</span>`;
 }
 
-// Colores para el gráfico — coinciden con los badges
 const COLORES_CATEGORIAS = {
     'Administracion y Negocios': '#1a6fa8',
     'Ciencia':                   '#1a8a5a',
@@ -120,7 +119,7 @@ function mostrarSeccion(seccion) {
     document.getElementById('seccion-' + seccion).style.display = 'block';
 
     if (seccion === 'dashboard') cargarEstadisticas();
-    if (seccion === 'libros') cargarLibros();
+    if (seccion === 'libros') cargarLibros(1);
     if (seccion === 'usuarios') cargarUsuarios();
     if (seccion === 'prestamos') cargarPrestamos();
 }
@@ -134,15 +133,12 @@ async function cargarEstadisticas() {
             fetch(`${API}/estadisticas`, { headers: headers() }),
             fetch(`${API}/estadisticas/categorias`, { headers: headers() })
         ]);
-
         const stats = await resStats.json();
         const categorias = await resCats.json();
-
         document.getElementById('stat-total-libros').textContent = stats.total_libros;
         document.getElementById('stat-total-usuarios').textContent = stats.total_usuarios;
         document.getElementById('stat-prestamos-activos').textContent = stats.prestamos_activos;
         document.getElementById('stat-prestamos-total').textContent = stats.prestamos_total;
-
         renderizarGrafico(categorias);
     } catch (err) {
         console.error('Error cargando estadísticas:', err);
@@ -154,10 +150,7 @@ function renderizarGrafico(categorias) {
     const datos = categorias.map(c => parseInt(c.total));
     const colores = categorias.map(c => COLORES_CATEGORIAS[c.categoria] || '#888888');
 
-    // Destruir gráfico anterior si existe
-    if (graficoCategorias) {
-        graficoCategorias.destroy();
-    }
+    if (graficoCategorias) graficoCategorias.destroy();
 
     const ctx = document.getElementById('graficoCategorias').getContext('2d');
     graficoCategorias = new Chart(ctx, {
@@ -184,7 +177,6 @@ function renderizarGrafico(categorias) {
         }
     });
 
-    // Leyenda personalizada
     const leyenda = document.getElementById('leyenda-categorias');
     leyenda.innerHTML = categorias.map(c => `
         <div class="leyenda-item">
@@ -196,12 +188,15 @@ function renderizarGrafico(categorias) {
 }
 
 // ==================== LIBROS ====================
-async function cargarLibros() {
-    const res = await fetch(`${API}/libros`);
-    const libros = await res.json();
+let paginaActual = 1;
+
+async function cargarLibros(page = 1) {
+    paginaActual = page;
+    const res = await fetch(`${API}/libros?page=${page}&limit=20`);
+    const data = await res.json();
     const tbody = document.getElementById('tabla-libros');
     tbody.innerHTML = '';
-    libros.forEach(l => {
+    data.libros.forEach(l => {
         tbody.innerHTML += `
             <tr>
                 <td>${l.titulo}</td>
@@ -219,6 +214,41 @@ async function cargarLibros() {
                 </td>
             </tr>`;
     });
+    renderizarPaginacion(data.page, data.totalPaginas, data.total);
+}
+
+function renderizarPaginacion(page, totalPaginas, total) {
+    let paginacion = document.getElementById('paginacion-libros');
+    if (!paginacion) return;
+
+    const desde = (page - 1) * 20 + 1;
+    const hasta = Math.min(page * 20, total);
+
+    let html = `<div class="d-flex justify-content-between align-items-center mt-3">
+        <small class="text-muted">Mostrando ${desde}–${hasta} de ${total} libros</small>
+        <nav><ul class="pagination pagination-sm mb-0">`;
+
+    html += `<li class="page-item ${page === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="cargarLibros(${page - 1})">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+    </li>`;
+
+    // Páginas cercanas
+    for (let i = Math.max(1, page - 2); i <= Math.min(totalPaginas, page + 2); i++) {
+        html += `<li class="page-item ${i === page ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="cargarLibros(${i})">${i}</a>
+        </li>`;
+    }
+
+    html += `<li class="page-item ${page === totalPaginas ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="cargarLibros(${page + 1})">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+    </li>`;
+
+    html += `</ul></nav></div>`;
+    paginacion.innerHTML = html;
 }
 
 async function cargarCategorias() {
@@ -286,7 +316,7 @@ async function guardarLibro() {
 
     if (res.ok) {
         bootstrap.Modal.getInstance(document.getElementById('modalLibro')).hide();
-        cargarLibros();
+        cargarLibros(paginaActual);
     } else {
         const err = await res.json();
         alert('Error: ' + err.error);
@@ -296,12 +326,12 @@ async function guardarLibro() {
 async function eliminarLibro(id) {
     if (!confirm('¿Estás seguro de eliminar este libro?')) return;
     await fetch(`${API}/libros/${id}`, { method: 'DELETE', headers: headers() });
-    cargarLibros();
+    cargarLibros(paginaActual);
 }
 
 async function buscarLibro() {
     const q = document.getElementById('buscar-libro').value;
-    if (q.length < 2) { cargarLibros(); return; }
+    if (q.length < 2) { cargarLibros(1); return; }
     const res = await fetch(`${API}/libros/buscar?q=${encodeURIComponent(q)}`);
     const libros = await res.json();
     const tbody = document.getElementById('tabla-libros');
@@ -324,6 +354,9 @@ async function buscarLibro() {
                 </td>
             </tr>`;
     });
+    // Limpiar paginación durante búsqueda
+    const paginacion = document.getElementById('paginacion-libros');
+    if (paginacion) paginacion.innerHTML = '';
 }
 
 // ==================== USUARIOS ====================
@@ -447,10 +480,10 @@ async function cargarPrestamos() {
 async function abrirModalPrestamo() {
     const [resUsuarios, resLibros] = await Promise.all([
         fetch(`${API}/usuarios`, { headers: headers() }),
-        fetch(`${API}/libros`)
+        fetch(`${API}/libros?limit=500`)
     ]);
     const usuarios = await resUsuarios.json();
-    const libros = await resLibros.json();
+    const data = await resLibros.json();
 
     const selUsuario = document.getElementById('prestamo-usuario');
     const selLibro = document.getElementById('prestamo-libro');
@@ -459,7 +492,7 @@ async function abrirModalPrestamo() {
         `<option value="${u.id_usuario}">${u.nombre} ${u.apellido}</option>`
     ).join('');
 
-    selLibro.innerHTML = libros.map(l =>
+    selLibro.innerHTML = data.libros.map(l =>
         `<option value="${l.id_libro}">${l.titulo}</option>`
     ).join('');
 
