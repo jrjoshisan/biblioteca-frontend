@@ -190,6 +190,42 @@ function renderizarGrafico(categorias) {
 // ==================== LIBROS ====================
 let paginaActual = 1;
 
+async function toggleLeido(id, leido) {
+    await fetch(`${API}/libros/${id}/leido`, {
+        method: 'PUT',
+        headers: headers(),
+        body: JSON.stringify({ leido })
+    });
+}
+
+function filaLibro(l) {
+    const leidoIcon = l.leido
+        ? `<i class="bi bi-check-circle-fill text-success" style="font-size:1.1rem; cursor:pointer" onclick="cambiarLeido(${l.id_libro}, false)" title="Marcar como no leído"></i>`
+        : `<i class="bi bi-circle text-muted" style="font-size:1.1rem; cursor:pointer" onclick="cambiarLeido(${l.id_libro}, true)" title="Marcar como leído"></i>`;
+
+    return `<tr class="${l.leido ? 'fila-leida' : ''}">
+        <td>${l.titulo}</td>
+        <td>${l.autor}</td>
+        <td>${getBadgeCategoria(l.categoria)}</td>
+        <td>${l.anio_publicacion || '-'}</td>
+        <td>${l.unidades}</td>
+        <td>${leidoIcon}</td>
+        <td>
+            <button class="btn btn-warning btn-sm" onclick="editarLibro(${l.id_libro})">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="eliminarLibro(${l.id_libro})">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>
+    </tr>`;
+}
+
+async function cambiarLeido(id, leido) {
+    await toggleLeido(id, leido);
+    cargarLibros(paginaActual);
+}
+
 async function cargarLibros(page = 1) {
     paginaActual = page;
     const res = await fetch(`${API}/libros?page=${page}&limit=20`);
@@ -197,22 +233,7 @@ async function cargarLibros(page = 1) {
     const tbody = document.getElementById('tabla-libros');
     tbody.innerHTML = '';
     data.libros.forEach(l => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${l.titulo}</td>
-                <td>${l.autor}</td>
-                <td>${getBadgeCategoria(l.categoria)}</td>
-                <td>${l.anio_publicacion || '-'}</td>
-                <td>${l.unidades}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="editarLibro(${l.id_libro})">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="eliminarLibro(${l.id_libro})">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
-            </tr>`;
+        tbody.innerHTML += filaLibro(l);
     });
     renderizarPaginacion(data.page, data.totalPaginas, data.total);
 }
@@ -234,7 +255,6 @@ function renderizarPaginacion(page, totalPaginas, total) {
         </a>
     </li>`;
 
-    // Páginas cercanas
     for (let i = Math.max(1, page - 2); i <= Math.min(totalPaginas, page + 2); i++) {
         html += `<li class="page-item ${i === page ? 'active' : ''}">
             <a class="page-link" href="#" onclick="cargarLibros(${i})">${i}</a>
@@ -337,24 +357,8 @@ async function buscarLibro() {
     const tbody = document.getElementById('tabla-libros');
     tbody.innerHTML = '';
     libros.forEach(l => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${l.titulo}</td>
-                <td>${l.autor}</td>
-                <td>${getBadgeCategoria(l.categoria)}</td>
-                <td>${l.anio_publicacion || '-'}</td>
-                <td>${l.unidades || '-'}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="editarLibro(${l.id_libro})">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="eliminarLibro(${l.id_libro})">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
-            </tr>`;
+        tbody.innerHTML += filaLibro(l);
     });
-    // Limpiar paginación durante búsqueda
     const paginacion = document.getElementById('paginacion-libros');
     if (paginacion) paginacion.innerHTML = '';
 }

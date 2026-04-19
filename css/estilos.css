@@ -448,3 +448,13 @@ body {
     color: #888;
     font-size: 0.82rem;
 }
+
+/* ==================== LEIDO ==================== */
+.fila-leida td {
+    opacity: 0.6;
+}
+
+.fila-leida td:first-child {
+    text-decoration: line-through;
+    color: #888;
+}
