@@ -189,6 +189,7 @@ function renderizarGrafico(categorias) {
 
 // ==================== LIBROS ====================
 let paginaActual = 1;
+let libroActual = null;
 
 async function toggleLeido(id, leido) {
     await fetch(`${API}/libros/${id}/leido`, {
@@ -200,30 +201,68 @@ async function toggleLeido(id, leido) {
 
 function filaLibro(l) {
     const leidoIcon = l.leido
-        ? `<i class="bi bi-check-circle-fill text-success" style="font-size:1.1rem; cursor:pointer" onclick="cambiarLeido(${l.id_libro}, false)" title="Marcar como no leído"></i>`
-        : `<i class="bi bi-circle text-muted" style="font-size:1.1rem; cursor:pointer" onclick="cambiarLeido(${l.id_libro}, true)" title="Marcar como leído"></i>`;
+        ? `<i class="bi bi-check-circle-fill text-success" style="font-size:1.1rem"></i>`
+        : `<i class="bi bi-circle text-muted" style="font-size:1.1rem"></i>`;
 
-    return `<tr class="${l.leido ? 'fila-leida' : ''}">
+    return `<tr class="${l.leido ? 'fila-leida' : ''}" style="cursor:pointer" onclick="verDetalleLibro(${l.id_libro})">
         <td>${l.titulo}</td>
         <td>${l.autor}</td>
         <td>${getBadgeCategoria(l.categoria)}</td>
-        <td>${l.anio_publicacion || '-'}</td>
-        <td>${l.unidades}</td>
         <td>${leidoIcon}</td>
         <td>
-            <button class="btn btn-warning btn-sm" onclick="editarLibro(${l.id_libro})">
-                <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="eliminarLibro(${l.id_libro})">
-                <i class="bi bi-trash"></i>
+            <button class="btn btn-outline-secondary btn-sm" onclick="event.stopPropagation(); verDetalleLibro(${l.id_libro})">
+                <i class="bi bi-eye"></i>
             </button>
         </td>
     </tr>`;
 }
 
-async function cambiarLeido(id, leido) {
-    await toggleLeido(id, leido);
+async function verDetalleLibro(id) {
+    const res = await fetch(`${API}/libros/${id}`);
+    const l = await res.json();
+    libroActual = l;
+
+    document.getElementById('detalleLibroTitulo').textContent = l.titulo;
+    document.getElementById('detalle-autor').textContent = l.autor || '-';
+    document.getElementById('detalle-categoria').innerHTML = getBadgeCategoria(l.categoria);
+    document.getElementById('detalle-anio').textContent = l.anio_publicacion || '-';
+    document.getElementById('detalle-unidades').textContent = l.unidades || '-';
+    document.getElementById('detalle-idioma').textContent = l.idioma || '-';
+    document.getElementById('detalle-editorial').textContent = l.editorial || '-';
+    document.getElementById('detalle-isbn').textContent = l.isbn || '-';
+
+    const btnLeido = document.getElementById('btn-toggle-leido');
+    if (l.leido) {
+        document.getElementById('detalle-leido').innerHTML = '<span class="badge bg-success">Leído</span>';
+        btnLeido.innerHTML = '<i class="bi bi-x-circle"></i> Marcar como no leído';
+        btnLeido.className = 'btn btn-outline-secondary';
+    } else {
+        document.getElementById('detalle-leido').innerHTML = '<span class="badge bg-secondary">No leído</span>';
+        btnLeido.innerHTML = '<i class="bi bi-check-circle"></i> Marcar como leído';
+        btnLeido.className = 'btn btn-success';
+    }
+
+    new bootstrap.Modal(document.getElementById('modalDetalleLibro')).show();
+}
+
+async function toggleLeidoDesdeModal() {
+    if (!libroActual) return;
+    const nuevoEstado = !libroActual.leido;
+    await toggleLeido(libroActual.id_libro, nuevoEstado);
+    bootstrap.Modal.getInstance(document.getElementById('modalDetalleLibro')).hide();
     cargarLibros(paginaActual);
+}
+
+function editarDesdeDetalle() {
+    if (!libroActual) return;
+    bootstrap.Modal.getInstance(document.getElementById('modalDetalleLibro')).hide();
+    setTimeout(() => editarLibro(libroActual.id_libro), 300);
+}
+
+function eliminarDesdeDetalle() {
+    if (!libroActual) return;
+    bootstrap.Modal.getInstance(document.getElementById('modalDetalleLibro')).hide();
+    setTimeout(() => eliminarLibro(libroActual.id_libro), 300);
 }
 
 async function cargarLibros(page = 1) {

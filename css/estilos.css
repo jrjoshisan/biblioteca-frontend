@@ -474,3 +474,26 @@ body {
         padding: 0.2rem 0.5rem;
     }
 }
+
+/* ==================== MODAL DETALLE ==================== */
+.detalle-campo {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    height: 100%;
+}
+
+.detalle-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 0.2rem;
+}
+
+.detalle-valor {
+    font-size: 0.9rem;
+    color: #1a1a2e;
+    font-weight: 500;
+}

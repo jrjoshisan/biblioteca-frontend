@@ -134,10 +134,8 @@
                             <th>Título</th>
                             <th>Autor</th>
                             <th>Categoría</th>
-                            <th>Año</th>
-                            <th>Unidades</th>
                             <th>Leído</th>
-                            <th>Acciones</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody id="tabla-libros"></tbody>
@@ -218,6 +216,85 @@
                     </div>
                     <button class="btn btn-primary w-100" onclick="hacerLogin()">
                         <i class="bi bi-box-arrow-in-right"></i> Ingresar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE LIBRO -->
+    <div class="modal fade" id="modalDetalleLibro" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="detalleLibroTitulo"></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="detalle-campo">
+                                <div class="detalle-label">Autor</div>
+                                <div class="detalle-valor" id="detalle-autor"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-campo">
+                                <div class="detalle-label">Categoría</div>
+                                <div class="detalle-valor" id="detalle-categoria"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-campo">
+                                <div class="detalle-label">Año</div>
+                                <div class="detalle-valor" id="detalle-anio"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-campo">
+                                <div class="detalle-label">Unidades</div>
+                                <div class="detalle-valor" id="detalle-unidades"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-campo">
+                                <div class="detalle-label">Idioma</div>
+                                <div class="detalle-valor" id="detalle-idioma"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-campo">
+                                <div class="detalle-label">Editorial</div>
+                                <div class="detalle-valor" id="detalle-editorial"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-campo">
+                                <div class="detalle-label">ISBN</div>
+                                <div class="detalle-valor" id="detalle-isbn"></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-campo">
+                                <div class="detalle-label">Estado</div>
+                                <div class="detalle-valor" id="detalle-leido"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" id="btn-toggle-leido"
+                        onclick="toggleLeidoDesdeModal()">
+                        <i class="bi bi-check-circle"></i> Marcar como leído
+                    </button>
+                    <button type="button" class="btn btn-warning" id="btn-editar-detalle"
+                        onclick="editarDesdeDetalle()">
+                        <i class="bi bi-pencil"></i> Editar
+                    </button>
+                    <button type="button" class="btn btn-danger" id="btn-eliminar-detalle"
+                        onclick="eliminarDesdeDetalle()">
+                        <i class="bi bi-trash"></i> Eliminar
                     </button>
                 </div>
             </div>
