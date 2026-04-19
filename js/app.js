@@ -59,6 +59,34 @@ function cerrarSesion() {
     verificarLogin();
 }
 
+// ==================== BADGES CATEGORIAS ====================
+function getBadgeCategoria(categoria) {
+    const mapa = {
+        'Administracion y Negocios': 'cat-administracion',
+        'Ciencia':                   'cat-ciencia',
+        'Cocina':                    'cat-cocina',
+        'Economia':                  'cat-economia',
+        'Fantasia Epica':            'cat-fantasia',
+        'Filosofia':                 'cat-filosofia',
+        'Genealogia':                'cat-genealogia',
+        'Historia':                  'cat-historia',
+        'Ingenieria Informatica':    'cat-ingenieria',
+        'LGTBIQ':                    'cat-lgtbiq',
+        'Literatura Clasica':        'cat-lit-clasica',
+        'Literatura Costarricense':  'cat-lit-costarricense',
+        'Literatura Español':        'cat-lit-espanol',
+        'Literatura Ingles':         'cat-lit-ingles',
+        'Literatura Latinoamericana':'cat-lit-latinoam',
+        'Relaciones Internacionales':'cat-rel-internac',
+        'Salud':                     'cat-salud',
+        'Novela Romantica y Erotica':'cat-novela-rom',
+        'Ciencia Ficcion':           'cat-ciencia-fic',
+        'Litaratura Frances':        'cat-lit-frances'
+    };
+    const clase = mapa[categoria] || 'cat-historia';
+    return `<span class="badge-categoria ${clase}">${categoria}</span>`;
+}
+
 // ==================== NAVEGACION ====================
 function mostrarSeccion(seccion) {
     document.getElementById('seccion-libros').style.display = 'none';
@@ -82,7 +110,7 @@ async function cargarLibros() {
             <tr>
                 <td>${l.titulo}</td>
                 <td>${l.autor}</td>
-                <td>${l.categoria}</td>
+                <td>${getBadgeCategoria(l.categoria)}</td>
                 <td>${l.anio_publicacion || '-'}</td>
                 <td>${l.unidades}</td>
                 <td>
@@ -187,7 +215,7 @@ async function buscarLibro() {
             <tr>
                 <td>${l.titulo}</td>
                 <td>${l.autor}</td>
-                <td>${l.categoria}</td>
+                <td>${getBadgeCategoria(l.categoria)}</td>
                 <td>${l.anio_publicacion || '-'}</td>
                 <td>${l.unidades || '-'}</td>
                 <td>
