@@ -361,3 +361,52 @@ body {
 .stat-prestamos-total .stat-numero {
     color: #6b2fa8;
 }
+
+/* ==================== GRAFICO ==================== */
+.grafico-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    height: 100%;
+}
+
+.grafico-titulo {
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.leyenda-item {
+    display: flex;
+    align-items: center;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid #f0f2f5;
+    font-size: 0.85rem;
+}
+
+.leyenda-item:last-child {
+    border-bottom: none;
+}
+
+.leyenda-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 0.6rem;
+    flex-shrink: 0;
+}
+
+.leyenda-nombre {
+    flex: 1;
+    color: #444;
+}
+
+.leyenda-total {
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-left: 0.5rem;
+}

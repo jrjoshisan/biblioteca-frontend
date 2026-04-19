@@ -87,6 +87,30 @@ function getBadgeCategoria(categoria) {
     return `<span class="badge-categoria ${clase}">${categoria}</span>`;
 }
 
+// Colores para el gráfico — coinciden con los badges
+const COLORES_CATEGORIAS = {
+    'Administracion y Negocios': '#1a6fa8',
+    'Ciencia':                   '#1a8a5a',
+    'Cocina':                    '#c45e0a',
+    'Economia':                  '#a07c0a',
+    'Fantasia Epica':            '#6b2fa8',
+    'Filosofia':                 '#2f3fa8',
+    'Genealogia':                '#a82f6b',
+    'Historia':                  '#a85a1a',
+    'Ingenieria Informatica':    '#0a8a85',
+    'LGTBIQ':                    '#a82fa8',
+    'Literatura Clasica':        '#8a6e0a',
+    'Literatura Costarricense':  '#2a8a2a',
+    'Literatura Español':        '#a82a2a',
+    'Literatura Ingles':         '#1a4fa8',
+    'Literatura Latinoamericana':'#a86a1a',
+    'Relaciones Internacionales':'#0a6a8a',
+    'Salud':                     '#3a8a1a',
+    'Novela Romantica y Erotica':'#a82080',
+    'Ciencia Ficcion':           '#4a2fa8',
+    'Litaratura Frances':        '#a82030'
+};
+
 // ==================== NAVEGACION ====================
 function mostrarSeccion(seccion) {
     document.getElementById('seccion-dashboard').style.display = 'none';
@@ -102,17 +126,73 @@ function mostrarSeccion(seccion) {
 }
 
 // ==================== DASHBOARD ====================
+let graficoCategorias = null;
+
 async function cargarEstadisticas() {
     try {
-        const res = await fetch(`${API}/estadisticas`, { headers: headers() });
-        const data = await res.json();
-        document.getElementById('stat-total-libros').textContent = data.total_libros;
-        document.getElementById('stat-total-usuarios').textContent = data.total_usuarios;
-        document.getElementById('stat-prestamos-activos').textContent = data.prestamos_activos;
-        document.getElementById('stat-prestamos-total').textContent = data.prestamos_total;
+        const [resStats, resCats] = await Promise.all([
+            fetch(`${API}/estadisticas`, { headers: headers() }),
+            fetch(`${API}/estadisticas/categorias`, { headers: headers() })
+        ]);
+
+        const stats = await resStats.json();
+        const categorias = await resCats.json();
+
+        document.getElementById('stat-total-libros').textContent = stats.total_libros;
+        document.getElementById('stat-total-usuarios').textContent = stats.total_usuarios;
+        document.getElementById('stat-prestamos-activos').textContent = stats.prestamos_activos;
+        document.getElementById('stat-prestamos-total').textContent = stats.prestamos_total;
+
+        renderizarGrafico(categorias);
     } catch (err) {
         console.error('Error cargando estadísticas:', err);
     }
+}
+
+function renderizarGrafico(categorias) {
+    const labels = categorias.map(c => c.categoria);
+    const datos = categorias.map(c => parseInt(c.total));
+    const colores = categorias.map(c => COLORES_CATEGORIAS[c.categoria] || '#888888');
+
+    // Destruir gráfico anterior si existe
+    if (graficoCategorias) {
+        graficoCategorias.destroy();
+    }
+
+    const ctx = document.getElementById('graficoCategorias').getContext('2d');
+    graficoCategorias = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data: datos,
+                backgroundColor: colores,
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.label}: ${ctx.raw} libros`
+                    }
+                }
+            }
+        }
+    });
+
+    // Leyenda personalizada
+    const leyenda = document.getElementById('leyenda-categorias');
+    leyenda.innerHTML = categorias.map(c => `
+        <div class="leyenda-item">
+            <span class="leyenda-color" style="background:${COLORES_CATEGORIAS[c.categoria] || '#888'}"></span>
+            <span class="leyenda-nombre">${c.categoria}</span>
+            <span class="leyenda-total">${c.total}</span>
+        </div>
+    `).join('');
 }
 
 // ==================== LIBROS ====================
