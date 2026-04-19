@@ -410,3 +410,41 @@ body {
     color: #1a1a2e;
     margin-left: 0.5rem;
 }
+
+/* ==================== PAGINACION ==================== */
+#paginacion-libros {
+    margin-bottom: 2rem;
+    margin-top: 0.5rem;
+}
+
+#paginacion-libros .pagination .page-link {
+    border: none;
+    color: #0f3460;
+    border-radius: 8px;
+    margin: 0 2px;
+    padding: 0.4rem 0.75rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+#paginacion-libros .pagination .page-link:hover {
+    background-color: #e8f4fd;
+    color: #0f3460;
+}
+
+#paginacion-libros .pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #0f3460, #4cc9f0);
+    color: #ffffff;
+    border-radius: 8px;
+}
+
+#paginacion-libros .pagination .page-item.disabled .page-link {
+    color: #c0c0c0;
+    background: transparent;
+}
+
+#paginacion-libros small {
+    color: #888;
+    font-size: 0.82rem;
+}
