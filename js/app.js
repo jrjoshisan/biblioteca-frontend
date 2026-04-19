@@ -17,10 +17,12 @@ function verificarLogin() {
     if (token) {
         document.getElementById('nav-login').style.display = 'none';
         document.getElementById('nav-logout').style.display = 'block';
+        document.getElementById('contenido-principal').style.display = 'block';
         mostrarSeccion('dashboard');
     } else {
         document.getElementById('nav-login').style.display = 'block';
         document.getElementById('nav-logout').style.display = 'none';
+        document.getElementById('contenido-principal').style.display = 'none';
         abrirModalLogin();
     }
 }
