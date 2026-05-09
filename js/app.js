@@ -133,7 +133,7 @@ function mostrarSeccion(seccion) {
     document.getElementById('seccion-' + seccion).style.display = 'block';
 
     if (seccion === 'dashboard') cargarEstadisticas();
-    if (seccion === 'libros') cargarLibros(1);
+    if (seccion === 'libros') { todosLosLibros = []; cargarLibros(1); }
     if (seccion === 'usuarios') cargarUsuarios();
     if (seccion === 'prestamos') cargarPrestamos();
 }
@@ -240,11 +240,29 @@ async function cargarFiltros() {
     selAut.value = valAut;
 }
 
-function aplicarFiltros() {
+async function cargarLibros(page = 1) {
+    paginaActual = page;
+
+    if (todosLosLibros.length === 0) {
+        const res = await fetch(`${API}/libros?limit=1000`);
+        const data = await res.json();
+        todosLosLibros = data.libros;
+        cargarFiltros();
+    }
+
+    renderizarTablaLibros();
+    const total = todosLosLibros.length;
+    const totalPaginas = Math.ceil(total / 20);
+    renderizarPaginacion(paginaActual, totalPaginas, total);
+}
+
+function renderizarTablaLibros() {
     const q = document.getElementById('buscar-libro').value.toLowerCase();
     const cat = document.getElementById('filtro-categoria').value;
     const autor = document.getElementById('filtro-autor').value;
     const leido = document.getElementById('filtro-leido').value;
+
+    const hayFiltros = q || cat || autor || leido !== '';
 
     let filtrados = todosLosLibros.filter(l => {
         const matchQ = !q || l.titulo.toLowerCase().includes(q) || l.autor.toLowerCase().includes(q);
@@ -256,14 +274,30 @@ function aplicarFiltros() {
 
     const tbody = document.getElementById('tabla-libros');
     tbody.innerHTML = '';
+
     if (filtrados.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No se encontraron libros con esos filtros.</td></tr>`;
-    } else {
-        filtrados.forEach(l => { tbody.innerHTML += filaLibro(l); });
+        const paginacion = document.getElementById('paginacion-libros');
+        if (paginacion) paginacion.innerHTML = `<small class="text-muted">0 libro(s) encontrado(s)</small>`;
+        return;
     }
 
-    const paginacion = document.getElementById('paginacion-libros');
-    if (paginacion) paginacion.innerHTML = `<small class="text-muted">${filtrados.length} libro(s) encontrado(s)</small>`;
+    if (hayFiltros) {
+        filtrados.forEach(l => { tbody.innerHTML += filaLibro(l); });
+        const paginacion = document.getElementById('paginacion-libros');
+        if (paginacion) paginacion.innerHTML = `<small class="text-muted">${filtrados.length} libro(s) encontrado(s)</small>`;
+    } else {
+        const inicio = (paginaActual - 1) * 20;
+        const fin = inicio + 20;
+        filtrados.slice(inicio, fin).forEach(l => { tbody.innerHTML += filaLibro(l); });
+        const totalPaginas = Math.ceil(filtrados.length / 20);
+        renderizarPaginacion(paginaActual, totalPaginas, filtrados.length);
+    }
+}
+
+function aplicarFiltros() {
+    paginaActual = 1;
+    renderizarTablaLibros();
 }
 
 function limpiarFiltros() {
@@ -271,8 +305,10 @@ function limpiarFiltros() {
     document.getElementById('filtro-categoria').value = '';
     document.getElementById('filtro-autor').value = '';
     document.getElementById('filtro-leido').value = '';
+    paginaActual = 1;
     renderizarTablaLibros();
-    renderizarPaginacion(paginaActual, Math.ceil(todosLosLibros.length / 20), todosLosLibros.length);
+    const total = todosLosLibros.length;
+    renderizarPaginacion(1, Math.ceil(total / 20), total);
 }
 
 async function toggleLeido(id, leido) {
@@ -299,16 +335,6 @@ function filaLibro(l) {
             </button>
         </td>
     </tr>`;
-}
-
-function renderizarTablaLibros() {
-    const tbody = document.getElementById('tabla-libros');
-    tbody.innerHTML = '';
-    const inicio = (paginaActual - 1) * 20;
-    const fin = inicio + 20;
-    todosLosLibros.slice(inicio, fin).forEach(l => {
-        tbody.innerHTML += filaLibro(l);
-    });
 }
 
 async function verDetalleLibro(id) {
@@ -373,6 +399,7 @@ async function guardarNotas() {
         btn.innerHTML = '<i class="bi bi-floppy"></i> Guardar notas';
     }, 2000);
 
+    todosLosLibros = [];
     cargarLibros(paginaActual);
 }
 
@@ -381,6 +408,7 @@ async function toggleLeidoDesdeModal() {
     const nuevoEstado = !libroActual.leido;
     await toggleLeido(libroActual.id_libro, nuevoEstado);
     bootstrap.Modal.getInstance(document.getElementById('modalDetalleLibro')).hide();
+    todosLosLibros = [];
     cargarLibros(paginaActual);
 }
 
@@ -394,16 +422,6 @@ function eliminarDesdeDetalle() {
     if (!libroActual) return;
     bootstrap.Modal.getInstance(document.getElementById('modalDetalleLibro')).hide();
     setTimeout(() => eliminarLibro(libroActual.id_libro), 300);
-}
-
-async function cargarLibros(page = 1) {
-    paginaActual = page;
-    const res = await fetch(`${API}/libros?page=${page}&limit=20`);
-    const data = await res.json();
-    todosLosLibros = data.libros;
-    renderizarTablaLibros();
-    renderizarPaginacion(data.page, data.totalPaginas, data.total);
-    cargarFiltros();
 }
 
 function renderizarPaginacion(page, totalPaginas, total) {
@@ -507,6 +525,7 @@ async function guardarLibro() {
 
     if (res.ok) {
         bootstrap.Modal.getInstance(document.getElementById('modalLibro')).hide();
+        todosLosLibros = [];
         cargarLibros(paginaActual);
     } else {
         const err = await res.json();
@@ -517,7 +536,8 @@ async function guardarLibro() {
 async function eliminarLibro(id) {
     if (!confirm('¿Estás seguro de eliminar este libro?')) return;
     await fetch(`${API}/libros/${id}`, { method: 'DELETE', headers: headers() });
-    cargarLibros(paginaActual);
+    todosLosLibros = [];
+    cargarLibros(1);
 }
 
 // ==================== USUARIOS ====================
