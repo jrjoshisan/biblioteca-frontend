@@ -287,6 +287,11 @@ body {
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     border-top: 4px solid transparent;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .stat-card:hover {
@@ -296,7 +301,8 @@ body {
 
 .stat-icon {
     font-size: 2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
+    line-height: 1;
 }
 
 .stat-numero {
@@ -314,6 +320,7 @@ body {
     letter-spacing: 0.5px;
 }
 
+/* Colores tarjetas */
 .stat-libros {
     border-top-color: #4cc9f0;
 }
@@ -324,6 +331,31 @@ body {
 
 .stat-libros .stat-numero {
     color: #0f3460;
+}
+
+.stat-leidos {
+    border-top-color: #2a8a2a;
+    cursor: default;
+}
+
+.stat-leidos .stat-icon {
+    color: #2a8a2a;
+}
+
+.stat-leidos .stat-numero {
+    color: #2a8a2a;
+}
+
+.stat-porcentaje {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #2a8a2a;
+    margin-top: 0.2rem;
+}
+
+.stat-card .progress {
+    width: 100%;
+    background-color: #e9ecef;
 }
 
 .stat-usuarios {
@@ -350,16 +382,21 @@ body {
     color: #f8961e;
 }
 
-.stat-prestamos-total {
-    border-top-color: #6b2fa8;
+/* Tarjeta préstamos combinada */
+.stat-prestamos-activos .stat-sublabel {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 0.1rem;
 }
 
-.stat-prestamos-total .stat-icon {
-    color: #6b2fa8;
-}
-
-.stat-prestamos-total .stat-numero {
-    color: #6b2fa8;
+.stat-prestamos-activos .divider-vertical {
+    width: 1px;
+    height: 40px;
+    background-color: #e9ecef;
+    margin: 0 0.5rem;
 }
 
 /* ==================== GRAFICO ==================== */
