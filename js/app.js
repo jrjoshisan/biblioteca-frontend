@@ -76,52 +76,52 @@ function cerrarSesion() {
 // ==================== BADGES CATEGORIAS ====================
 function getBadgeCategoria(categoria) {
     const mapa = {
-        'Administracion y Negocios': 'cat-administracion',
+        'Administración y Negocios': 'cat-administracion',
         'Ciencia':                   'cat-ciencia',
         'Cocina':                    'cat-cocina',
-        'Economia':                  'cat-economia',
-        'Fantasia Epica':            'cat-fantasia',
-        'Filosofia':                 'cat-filosofia',
-        'Genealogia':                'cat-genealogia',
+        'Economía':                  'cat-economia',
+        'Fantasía Épica':            'cat-fantasia',
+        'Filosofía':                 'cat-filosofia',
+        'Genealogía':                'cat-genealogia',
         'Historia':                  'cat-historia',
-        'Ingenieria Informatica':    'cat-ingenieria',
+        'Ingeniería Informática':    'cat-ingenieria',
         'LGTBIQ':                    'cat-lgtbiq',
-        'Literatura Clasica':        'cat-lit-clasica',
+        'Literatura Clásica':        'cat-lit-clasica',
         'Literatura Costarricense':  'cat-lit-costarricense',
-        'Literatura Español':        'cat-lit-espanol',
-        'Literatura Ingles':         'cat-lit-ingles',
+        'Literatura Española':       'cat-lit-espanol',
+        'Literatura Inglesa':        'cat-lit-ingles',
         'Literatura Latinoamericana':'cat-lit-latinoam',
         'Relaciones Internacionales':'cat-rel-internac',
         'Salud':                     'cat-salud',
-        'Novela Romantica y Erotica':'cat-novela-rom',
-        'Ciencia Ficcion':           'cat-ciencia-fic',
-        'Litaratura Frances':        'cat-lit-frances'
+        'Novela Romántica y Erótica':'cat-novela-rom',
+        'Ciencia Ficción':           'cat-ciencia-fic',
+        'Literatura Francesa':       'cat-lit-frances'
     };
     const clase = mapa[categoria] || 'cat-historia';
     return `<span class="badge-categoria ${clase}">${categoria}</span>`;
 }
 
 const COLORES_CATEGORIAS = {
-    'Administracion y Negocios': '#1a6fa8',
+    'Administración y Negocios': '#1a6fa8',
     'Ciencia':                   '#1a8a5a',
     'Cocina':                    '#c45e0a',
-    'Economia':                  '#a07c0a',
-    'Fantasia Epica':            '#6b2fa8',
-    'Filosofia':                 '#2f3fa8',
-    'Genealogia':                '#a82f6b',
+    'Economía':                  '#a07c0a',
+    'Fantasía Épica':            '#6b2fa8',
+    'Filosofía':                 '#2f3fa8',
+    'Genealogía':                '#a82f6b',
     'Historia':                  '#a85a1a',
-    'Ingenieria Informatica':    '#0a8a85',
+    'Ingeniería Informática':    '#0a8a85',
     'LGTBIQ':                    '#a82fa8',
-    'Literatura Clasica':        '#8a6e0a',
+    'Literatura Clásica':        '#8a6e0a',
     'Literatura Costarricense':  '#2a8a2a',
-    'Literatura Español':        '#a82a2a',
-    'Literatura Ingles':         '#1a4fa8',
+    'Literatura Española':       '#a82a2a',
+    'Literatura Inglesa':        '#1a4fa8',
     'Literatura Latinoamericana':'#a86a1a',
     'Relaciones Internacionales':'#0a6a8a',
     'Salud':                     '#3a8a1a',
-    'Novela Romantica y Erotica':'#a82080',
-    'Ciencia Ficcion':           '#4a2fa8',
-    'Litaratura Frances':        '#a82030'
+    'Novela Romántica y Erótica':'#a82080',
+    'Ciencia Ficción':           '#4a2fa8',
+    'Literatura Francesa':       '#a82030'
 };
 
 // ==================== NAVEGACION ====================
