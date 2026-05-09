@@ -112,8 +112,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- GRAFICO CATEGORIAS -->
             <div class="row mt-2">
                 <div class="col-md-5">
                     <div class="grafico-card">
@@ -143,10 +141,35 @@
                     </button>
                 </div>
             </div>
-            <div class="mb-3">
-                <input type="text" id="buscar-libro" class="form-control" placeholder="Buscar por título..."
-                    oninput="buscarLibro()">
+
+            <!-- BARRA DE FILTROS -->
+            <div class="filtros-bar mb-3">
+                <div class="filtro-item">
+                    <input type="text" id="buscar-libro" class="form-control" placeholder="🔍 Buscar por título..."
+                        oninput="aplicarFiltros()">
+                </div>
+                <div class="filtro-item">
+                    <select id="filtro-categoria" class="form-select" onchange="aplicarFiltros()">
+                        <option value="">Todas las categorías</option>
+                    </select>
+                </div>
+                <div class="filtro-item">
+                    <select id="filtro-autor" class="form-select" onchange="aplicarFiltros()">
+                        <option value="">Todos los autores</option>
+                    </select>
+                </div>
+                <div class="filtro-item">
+                    <select id="filtro-leido" class="form-select" onchange="aplicarFiltros()">
+                        <option value="">Todos</option>
+                        <option value="true">Leídos</option>
+                        <option value="false">No leídos</option>
+                    </select>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="limpiarFiltros()">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </button>
             </div>
+
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
                     <thead class="table-dark">
@@ -259,14 +282,14 @@
 
     <!-- MODAL DETALLE LIBRO -->
     <div class="modal fade" id="modalDetalleLibro" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-dark text-white">
                     <h5 class="modal-title" id="detalleLibroTitulo"></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row g-2">
+                    <div class="row g-2 mb-3">
                         <div class="col-6">
                             <div class="detalle-campo">
                                 <div class="detalle-label">Autor</div>
@@ -316,6 +339,19 @@
                             </div>
                         </div>
                     </div>
+                    <!-- NOTAS -->
+                    <div class="detalle-campo">
+                        <div class="detalle-label mb-1">Notas / Reseña</div>
+                        <textarea id="detalle-notas" class="form-control" rows="4"
+                            placeholder="Escribí tus notas o reseña sobre este libro..."
+                            oninput="habilitarGuardarNotas()"></textarea>
+                        <div class="text-end mt-2">
+                            <button class="btn btn-sm btn-primary" id="btn-guardar-notas" onclick="guardarNotas()"
+                                disabled>
+                                <i class="bi bi-floppy"></i> Guardar notas
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -323,12 +359,10 @@
                         onclick="toggleLeidoDesdeModal()">
                         <i class="bi bi-check-circle"></i> Marcar como leído
                     </button>
-                    <button type="button" class="btn btn-warning" id="btn-editar-detalle"
-                        onclick="editarDesdeDetalle()">
+                    <button type="button" class="btn btn-warning" onclick="editarDesdeDetalle()">
                         <i class="bi bi-pencil"></i> Editar
                     </button>
-                    <button type="button" class="btn btn-danger" id="btn-eliminar-detalle"
-                        onclick="eliminarDesdeDetalle()">
+                    <button type="button" class="btn btn-danger" onclick="eliminarDesdeDetalle()">
                         <i class="bi bi-trash"></i> Eliminar
                     </button>
                 </div>
@@ -379,6 +413,11 @@
                     <div class="mb-3">
                         <label class="form-label">Editorial</label>
                         <input type="text" id="libro-editorial" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notas / Reseña</label>
+                        <textarea id="libro-notas" class="form-control" rows="3"
+                            placeholder="Notas opcionales..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -213,6 +213,67 @@ function renderizarGrafico(categorias) {
 // ==================== LIBROS ====================
 let paginaActual = 1;
 let libroActual = null;
+let todosLosLibros = [];
+
+async function cargarFiltros() {
+    const [resCats, resAutores] = await Promise.all([
+        fetch(`${API}/categorias`),
+        fetch(`${API}/autores`)
+    ]);
+    const categorias = await resCats.json();
+    const autores = await resAutores.json();
+
+    const selCat = document.getElementById('filtro-categoria');
+    const valCat = selCat.value;
+    selCat.innerHTML = '<option value="">Todas las categorías</option>';
+    categorias.forEach(c => {
+        selCat.innerHTML += `<option value="${c.nombre}">${c.nombre}</option>`;
+    });
+    selCat.value = valCat;
+
+    const selAut = document.getElementById('filtro-autor');
+    const valAut = selAut.value;
+    selAut.innerHTML = '<option value="">Todos los autores</option>';
+    autores.forEach(a => {
+        selAut.innerHTML += `<option value="${a.autor}">${a.autor}</option>`;
+    });
+    selAut.value = valAut;
+}
+
+function aplicarFiltros() {
+    const q = document.getElementById('buscar-libro').value.toLowerCase();
+    const cat = document.getElementById('filtro-categoria').value;
+    const autor = document.getElementById('filtro-autor').value;
+    const leido = document.getElementById('filtro-leido').value;
+
+    let filtrados = todosLosLibros.filter(l => {
+        const matchQ = !q || l.titulo.toLowerCase().includes(q) || l.autor.toLowerCase().includes(q);
+        const matchCat = !cat || l.categoria === cat;
+        const matchAutor = !autor || l.autor === autor;
+        const matchLeido = leido === '' || String(l.leido) === leido;
+        return matchQ && matchCat && matchAutor && matchLeido;
+    });
+
+    const tbody = document.getElementById('tabla-libros');
+    tbody.innerHTML = '';
+    if (filtrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No se encontraron libros con esos filtros.</td></tr>`;
+    } else {
+        filtrados.forEach(l => { tbody.innerHTML += filaLibro(l); });
+    }
+
+    const paginacion = document.getElementById('paginacion-libros');
+    if (paginacion) paginacion.innerHTML = `<small class="text-muted">${filtrados.length} libro(s) encontrado(s)</small>`;
+}
+
+function limpiarFiltros() {
+    document.getElementById('buscar-libro').value = '';
+    document.getElementById('filtro-categoria').value = '';
+    document.getElementById('filtro-autor').value = '';
+    document.getElementById('filtro-leido').value = '';
+    renderizarTablaLibros();
+    renderizarPaginacion(paginaActual, Math.ceil(todosLosLibros.length / 20), todosLosLibros.length);
+}
 
 async function toggleLeido(id, leido) {
     await fetch(`${API}/libros/${id}/leido`, {
@@ -228,7 +289,7 @@ function filaLibro(l) {
         : `<i class="bi bi-circle text-muted" style="font-size:1.1rem"></i>`;
 
     return `<tr class="${l.leido ? 'fila-leida' : ''}" style="cursor:pointer" onclick="verDetalleLibro(${l.id_libro})">
-        <td>${l.titulo}${l.leido ? '<span class="badge-leido">Leído</span>' : ''}</td>
+        <td>${l.titulo}${l.leido ? '<span class="badge-leido">Leído</span>' : ''}${l.notas ? '<i class="bi bi-journal-text text-muted ms-1" title="Tiene notas"></i>' : ''}</td>
         <td>${l.autor}</td>
         <td>${getBadgeCategoria(l.categoria)}</td>
         <td>${leidoIcon}</td>
@@ -238,6 +299,16 @@ function filaLibro(l) {
             </button>
         </td>
     </tr>`;
+}
+
+function renderizarTablaLibros() {
+    const tbody = document.getElementById('tabla-libros');
+    tbody.innerHTML = '';
+    const inicio = (paginaActual - 1) * 20;
+    const fin = inicio + 20;
+    todosLosLibros.slice(inicio, fin).forEach(l => {
+        tbody.innerHTML += filaLibro(l);
+    });
 }
 
 async function verDetalleLibro(id) {
@@ -253,6 +324,8 @@ async function verDetalleLibro(id) {
     document.getElementById('detalle-idioma').textContent = l.idioma || '-';
     document.getElementById('detalle-editorial').textContent = l.editorial || '-';
     document.getElementById('detalle-isbn').textContent = l.isbn || '-';
+    document.getElementById('detalle-notas').value = l.notas || '';
+    document.getElementById('btn-guardar-notas').disabled = true;
 
     const btnLeido = document.getElementById('btn-toggle-leido');
     if (l.leido) {
@@ -266,6 +339,41 @@ async function verDetalleLibro(id) {
     }
 
     new bootstrap.Modal(document.getElementById('modalDetalleLibro')).show();
+}
+
+function habilitarGuardarNotas() {
+    document.getElementById('btn-guardar-notas').disabled = false;
+}
+
+async function guardarNotas() {
+    if (!libroActual) return;
+    const notas = document.getElementById('detalle-notas').value;
+    const datos = {
+        isbn: libroActual.isbn,
+        titulo: libroActual.titulo,
+        autor: libroActual.autor,
+        categoria: libroActual.categoria,
+        anio_publicacion: libroActual.anio_publicacion,
+        idioma: libroActual.idioma,
+        editorial: libroActual.editorial,
+        unidades: libroActual.unidades,
+        notas
+    };
+    await fetch(`${API}/libros/${libroActual.id_libro}`, {
+        method: 'PUT',
+        headers: headers(),
+        body: JSON.stringify(datos)
+    });
+    libroActual.notas = notas;
+    document.getElementById('btn-guardar-notas').disabled = true;
+
+    const btn = document.getElementById('btn-guardar-notas');
+    btn.innerHTML = '<i class="bi bi-check-lg"></i> Guardado';
+    setTimeout(() => {
+        btn.innerHTML = '<i class="bi bi-floppy"></i> Guardar notas';
+    }, 2000);
+
+    cargarLibros(paginaActual);
 }
 
 async function toggleLeidoDesdeModal() {
@@ -292,12 +400,10 @@ async function cargarLibros(page = 1) {
     paginaActual = page;
     const res = await fetch(`${API}/libros?page=${page}&limit=20`);
     const data = await res.json();
-    const tbody = document.getElementById('tabla-libros');
-    tbody.innerHTML = '';
-    data.libros.forEach(l => {
-        tbody.innerHTML += filaLibro(l);
-    });
+    todosLosLibros = data.libros;
+    renderizarTablaLibros();
     renderizarPaginacion(data.page, data.totalPaginas, data.total);
+    cargarFiltros();
 }
 
 function renderizarPaginacion(page, totalPaginas, total) {
@@ -352,6 +458,7 @@ function abrirModalLibro() {
     document.getElementById('libro-unidades').value = '1';
     document.getElementById('libro-idioma').value = '';
     document.getElementById('libro-editorial').value = '';
+    document.getElementById('libro-notas').value = '';
     document.getElementById('modalLibroTitulo').textContent = 'Agregar Libro';
     cargarCategorias();
     new bootstrap.Modal(document.getElementById('modalLibro')).show();
@@ -368,6 +475,7 @@ async function editarLibro(id) {
     document.getElementById('libro-unidades').value = l.unidades;
     document.getElementById('libro-idioma').value = l.idioma || '';
     document.getElementById('libro-editorial').value = l.editorial || '';
+    document.getElementById('libro-notas').value = l.notas || '';
     document.getElementById('modalLibroTitulo').textContent = 'Editar Libro';
     await cargarCategorias();
     document.getElementById('libro-categoria').value = l.categoria;
@@ -384,7 +492,8 @@ async function guardarLibro() {
         anio_publicacion: parseInt(document.getElementById('libro-anio').value) || null,
         idioma: document.getElementById('libro-idioma').value,
         editorial: document.getElementById('libro-editorial').value,
-        unidades: parseInt(document.getElementById('libro-unidades').value) || 1
+        unidades: parseInt(document.getElementById('libro-unidades').value) || 1,
+        notas: document.getElementById('libro-notas').value
     };
 
     const url = id ? `${API}/libros/${id}` : `${API}/libros`;
@@ -409,20 +518,6 @@ async function eliminarLibro(id) {
     if (!confirm('¿Estás seguro de eliminar este libro?')) return;
     await fetch(`${API}/libros/${id}`, { method: 'DELETE', headers: headers() });
     cargarLibros(paginaActual);
-}
-
-async function buscarLibro() {
-    const q = document.getElementById('buscar-libro').value;
-    if (q.length < 2) { cargarLibros(1); return; }
-    const res = await fetch(`${API}/libros/buscar?q=${encodeURIComponent(q)}`);
-    const libros = await res.json();
-    const tbody = document.getElementById('tabla-libros');
-    tbody.innerHTML = '';
-    libros.forEach(l => {
-        tbody.innerHTML += filaLibro(l);
-    });
-    const paginacion = document.getElementById('paginacion-libros');
-    if (paginacion) paginacion.innerHTML = '';
 }
 
 // ==================== USUARIOS ====================
@@ -603,15 +698,16 @@ async function exportarLibros() {
     const data = await res.json();
 
     const filas = data.libros.map(l => ({
-        'Título':       l.titulo,
-        'Autor':        l.autor,
-        'Categoría':    l.categoria,
-        'Año':          l.anio_publicacion || '',
-        'Editorial':    l.editorial || '',
-        'Idioma':       l.idioma || '',
-        'ISBN':         l.isbn || '',
-        'Unidades':     l.unidades,
-        'Leído':        l.leido ? 'Sí' : 'No'
+        'Título':    l.titulo,
+        'Autor':     l.autor,
+        'Categoría': l.categoria,
+        'Año':       l.anio_publicacion || '',
+        'Editorial': l.editorial || '',
+        'Idioma':    l.idioma || '',
+        'ISBN':      l.isbn || '',
+        'Unidades':  l.unidades,
+        'Leído':     l.leido ? 'Sí' : 'No',
+        'Notas':     l.notas || ''
     }));
 
     const hoja = XLSX.utils.json_to_sheet(filas);
@@ -644,12 +740,12 @@ async function exportarPrestamos() {
     const prestamos = await res.json();
 
     const filas = prestamos.map(p => ({
-        'Usuario':               p.usuario,
-        'Libro':                 p.libro,
-        'Fecha Préstamo':        p.fecha_prestamo ? new Date(p.fecha_prestamo).toLocaleDateString('es-CR') : '',
-        'Fecha Dev. Esperada':   p.fecha_devolucion_esperada ? new Date(p.fecha_devolucion_esperada).toLocaleDateString('es-CR') : '',
-        'Fecha Dev. Real':       p.fecha_devolucion_real ? new Date(p.fecha_devolucion_real).toLocaleDateString('es-CR') : '',
-        'Estado':                p.estado
+        'Usuario':             p.usuario,
+        'Libro':               p.libro,
+        'Fecha Préstamo':      p.fecha_prestamo ? new Date(p.fecha_prestamo).toLocaleDateString('es-CR') : '',
+        'Fecha Dev. Esperada': p.fecha_devolucion_esperada ? new Date(p.fecha_devolucion_esperada).toLocaleDateString('es-CR') : '',
+        'Fecha Dev. Real':     p.fecha_devolucion_real ? new Date(p.fecha_devolucion_real).toLocaleDateString('es-CR') : '',
+        'Estado':              p.estado
     }));
 
     const hoja = XLSX.utils.json_to_sheet(filas);
