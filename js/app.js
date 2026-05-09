@@ -149,10 +149,20 @@ async function cargarEstadisticas() {
         ]);
         const stats = await resStats.json();
         const categorias = await resCats.json();
+
         document.getElementById('stat-total-libros').textContent = stats.total_libros;
         document.getElementById('stat-total-usuarios').textContent = stats.total_usuarios;
         document.getElementById('stat-prestamos-activos').textContent = stats.prestamos_activos;
         document.getElementById('stat-prestamos-total').textContent = stats.prestamos_total;
+
+        // Tarjeta leídos
+        const leidos = stats.libros_leidos;
+        const total = stats.total_libros;
+        const porcentaje = total > 0 ? Math.round((leidos / total) * 100) : 0;
+        document.getElementById('stat-libros-leidos').textContent = leidos;
+        document.getElementById('stat-porcentaje-leidos').textContent = porcentaje + '%';
+        document.getElementById('barra-leidos').style.width = porcentaje + '%';
+
         renderizarGrafico(categorias);
     } catch (err) {
         console.error('Error cargando estadísticas:', err);
