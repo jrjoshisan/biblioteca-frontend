@@ -155,7 +155,6 @@ async function cargarEstadisticas() {
         document.getElementById('stat-prestamos-activos').textContent = stats.prestamos_activos;
         document.getElementById('stat-prestamos-total').textContent = stats.prestamos_total;
 
-        // Tarjeta leídos
         const leidos = stats.libros_leidos;
         const total = stats.total_libros;
         const porcentaje = total > 0 ? Math.round((leidos / total) * 100) : 0;
@@ -596,6 +595,67 @@ async function devolverLibro(id) {
     if (!confirm('¿Confirmar devolución?')) return;
     await fetch(`${API}/prestamos/${id}/devolver`, { method: 'PUT', headers: headers() });
     cargarPrestamos();
+}
+
+// ==================== EXPORTAR EXCEL ====================
+async function exportarLibros() {
+    const res = await fetch(`${API}/libros?limit=1000`);
+    const data = await res.json();
+
+    const filas = data.libros.map(l => ({
+        'Título':       l.titulo,
+        'Autor':        l.autor,
+        'Categoría':    l.categoria,
+        'Año':          l.anio_publicacion || '',
+        'Editorial':    l.editorial || '',
+        'Idioma':       l.idioma || '',
+        'ISBN':         l.isbn || '',
+        'Unidades':     l.unidades,
+        'Leído':        l.leido ? 'Sí' : 'No'
+    }));
+
+    const hoja = XLSX.utils.json_to_sheet(filas);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, 'Libros');
+    XLSX.writeFile(libro, 'biblioteca_libros.xlsx');
+}
+
+async function exportarUsuarios() {
+    const res = await fetch(`${API}/usuarios`, { headers: headers() });
+    const usuarios = await res.json();
+
+    const filas = usuarios.map(u => ({
+        'Nombre':       u.nombre,
+        'Apellido':     u.apellido,
+        'Email':        u.email || '',
+        'Teléfono':     u.telefono || '',
+        'Documento ID': u.documento_id || '',
+        'Dirección':    u.direccion || ''
+    }));
+
+    const hoja = XLSX.utils.json_to_sheet(filas);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, 'Usuarios');
+    XLSX.writeFile(libro, 'biblioteca_usuarios.xlsx');
+}
+
+async function exportarPrestamos() {
+    const res = await fetch(`${API}/prestamos`, { headers: headers() });
+    const prestamos = await res.json();
+
+    const filas = prestamos.map(p => ({
+        'Usuario':               p.usuario,
+        'Libro':                 p.libro,
+        'Fecha Préstamo':        p.fecha_prestamo ? new Date(p.fecha_prestamo).toLocaleDateString('es-CR') : '',
+        'Fecha Dev. Esperada':   p.fecha_devolucion_esperada ? new Date(p.fecha_devolucion_esperada).toLocaleDateString('es-CR') : '',
+        'Fecha Dev. Real':       p.fecha_devolucion_real ? new Date(p.fecha_devolucion_real).toLocaleDateString('es-CR') : '',
+        'Estado':                p.estado
+    }));
+
+    const hoja = XLSX.utils.json_to_sheet(filas);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, 'Prestamos');
+    XLSX.writeFile(libro, 'biblioteca_prestamos.xlsx');
 }
 
 // ==================== INICIO ====================
